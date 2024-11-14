@@ -13,8 +13,24 @@ from statsmodels.stats.proportion import proportions_ztest # para hacer el ztest
 import seaborn as sns
 import matplotlib.pyplot as plt
 
+from sklearn.neighbors import LocalOutlierFactor
+from itertools import product, combinations
+
+from tqdm import tqdm
 
 # ------------- #
+
+def gestion_nulos_lof(df, col_numericas, list_neighbors, lista_contaminacion):
+    
+    combinaciones = list(product(list_neighbors, lista_contaminacion))
+    
+    for neighbors, contaminacion in tqdm(combinaciones):
+        lof = LocalOutlierFactor(n_neighbors=neighbors, 
+                                 contamination=contaminacion,
+                                 n_jobs=-1)
+        df[f"outliers_lof_{neighbors}_{contaminacion}"] = lof.fit_predict(df[col_numericas])
+
+    return df
 
 def exploracion_dataframe(dataframe, columna_control):
     """
